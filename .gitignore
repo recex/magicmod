@@ -1,0 +1,27 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# Forge run directories
+run/
+runClient/
+runServer/
+logs/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Scripts auxiliares usados so para gerar assets (nao essenciais ao mod)
+gen_lang.py
+gen_textures.py

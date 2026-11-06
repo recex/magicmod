@@ -1,0 +1,27 @@
+{
+  "targets": [
+    "swap"
+  ],
+  "passes": [
+    {
+      "name": "magicmod:spell_distortion",
+      "intarget": "minecraft:main",
+      "outtarget": "swap",
+      "uniforms": [
+        {
+          "name": "Intensity",
+          "values": [ 1.0 ]
+        },
+        {
+          "name": "EffectColor",
+          "values": [ 0.7, 0.4, 1.0 ]
+        }
+      ]
+    },
+    {
+      "name": "minecraft:blit_screen",
+      "intarget": "swap",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}
