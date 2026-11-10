@@ -25,3 +25,4 @@ Thumbs.db
 # Scripts auxiliares usados so para gerar assets (nao essenciais ao mod)
 gen_lang.py
 gen_textures.py
+build.log

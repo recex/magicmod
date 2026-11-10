@@ -2,10 +2,14 @@ name: Build Mod
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "main", "master", "arena/**" ]
   pull_request:
     branches: [ "main", "master" ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   build:
@@ -26,7 +30,18 @@ jobs:
           gradle-version: '8.1.1'
 
       - name: Build with Gradle
-        run: gradle build --no-daemon --stacktrace
+        id: gradle_build
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle build --no-daemon --stacktrace 2>&1 | tee build.log
+
+      - name: Build report
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CHECK_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 .github/scripts/ci_report.py build.log "${{ steps.gradle_build.outcome }}"
 
       - name: Upload mod jar
         uses: actions/upload-artifact@v4
