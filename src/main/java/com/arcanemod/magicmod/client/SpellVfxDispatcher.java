@@ -1,7 +1,9 @@
 package com.arcanemod.magicmod.client;
 
 import com.arcanemod.magicmod.client.particle.ArcaneSparkleParticleOption;
-import com.arcanemod.magicmod.client.shader.ShaderEffectManager;
+import com.arcanemod.magicmod.MagicMod;
+import com.arcanemod.magicmod.client.vfx.SpellEffects;
+import com.arcanemod.magicmod.engine.core.ArcaneEngine;
 import com.arcanemod.magicmod.network.SpellVfxPacket;
 import com.arcanemod.magicmod.registry.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -9,21 +11,47 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 
 /**
- * Le o VisualProfile associado ao id da magia e produz os efeitos
- * (particulas de impacto, shockwave em anel, trilha de cast, shader
- * de pos-processamento) de forma generica. Isso e o que permite que
- * as 30 magias compartilhem um unico pipeline visual robusto,
- * variando apenas os parametros do perfil.
+ * Ponto de entrada dos efeitos visuais no cliente: recebe o pacote da magia,
+ * le o {@link VisualProfile} dela e entrega ao motor de efeitos
+ * ({@link SpellEffects}). Se o motor nao puder ser usado - desligado na
+ * configuracao, pacote de shaders ativo, placa sem suporte ou erro - a magia
+ * usa as particulas simples originais, que continuam neste arquivo.
  */
 public class SpellVfxDispatcher {
+
+    private static boolean warned;
+    private static int dispatched;
+
+    /** Quantos pacotes de efeito ja chegaram (diagnostico e autoteste). */
+    public static int dispatchedCount() {
+        return dispatched;
+    }
 
     public static void dispatch(SpellVfxPacket msg) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         if (level == null) return;
+        dispatched++;
 
         VisualProfile profile = VisualProfiles.get(msg.spellId.getPath());
 
+        ArcaneEngine engine = ArcaneEngine.get();
+        if (engine != null && engine.isUsable()) {
+            try {
+                SpellEffects.play(engine, msg, profile);
+                return;
+            } catch (RuntimeException e) {
+                if (!warned) {
+                    warned = true;
+                    MagicMod.LOGGER.error("Efeito de {} falhou; usando particulas simples", msg.spellId, e);
+                }
+            }
+        }
+        dispatchLegacy(level, msg, profile);
+    }
+
+    /** Efeitos originais, so com particulas do jogo. */
+    private static void dispatchLegacy(ClientLevel level, SpellVfxPacket msg, VisualProfile profile) {
         spawnImpactBurst(level, msg.x, msg.y, msg.z, profile);
 
         if (profile.ringShockwave) {
@@ -43,14 +71,6 @@ public class SpellVfxDispatcher {
 
         if (profile.starfallEffect) {
             spawnStarfall(level, msg.x, msg.y, msg.z, profile);
-        }
-
-        if (profile.fullscreenShader) {
-            if (profile.singularityShader) {
-                ShaderEffectManager.get().triggerSingularity(profile.shaderDurationTicks, profile.r, profile.g, profile.b);
-            } else {
-                ShaderEffectManager.get().triggerSpellDistortion(profile.shaderDurationTicks, profile.r, profile.g, profile.b);
-            }
         }
 
         level.playLocalSound(msg.x, msg.y, msg.z,

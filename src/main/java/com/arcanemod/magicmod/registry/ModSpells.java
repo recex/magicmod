@@ -221,10 +221,9 @@ public class ModSpells {
                         .impactParticles(65).ringShockwave(true).particleScale(1.0f)
                         .build());
 
-        // Singularidade (EXPERIMENTAL): cria um ponto de gravidade que
-        // puxa entidades proximas e distorce a propria tela com um
-        // shader de "buraco negro" (ver shaders/core/singularity.fsh).
-        // Risco de build conhecido: ver ShaderEffectManager e README.
+        // Singularidade: cria um ponto de gravidade que puxa entidades
+        // proximas; no cliente, o motor de efeitos desenha o buraco negro
+        // com lente gravitacional (ver shaders/vfx/volume/blackhole.fsh).
         register(new GravityWellSpell(id("singularity"), SpellSchool.ARCANE, 60, 400, 3,
                         6.0, 0.9, 10.0f),
                 VisualProfile.builder(0x6A1FB3)

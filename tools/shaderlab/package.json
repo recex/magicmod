@@ -1,0 +1,15 @@
+{
+  "name": "magicmod-shaderlab",
+  "private": true,
+  "type": "module",
+  "description": "Compila e renderiza os shaders do motor de VFX fora do jogo (WebGL2 em Chromium sem tela).",
+  "scripts": {
+    "fireball": "node lab.mjs sc_fireball.js out_fireball.png 640 360",
+    "core": "node lab.mjs sc_core.js out_core.png 640 360",
+    "volumes": "node lab.mjs sc_vol.js out_vol.png 640 360"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "153.0.0",
+    "puppeteer-core": "^24.0.0"
+  }
+}

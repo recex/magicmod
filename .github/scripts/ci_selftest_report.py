@@ -110,7 +110,7 @@ def main():
     for crash in sorted(glob.glob("run/crash-reports/*.txt"))[-1:]:
         partes += ["== CRASH REPORT ==", ler(crash)[:15000]]
     texto = "```\n" + "\n".join(partes)[:LIMITE] + "\n```"
-    falhas = [l for l in relatorio.splitlines() if l.startswith("FAIL")]
+    falhas = [l for l in relatorio.splitlines() if l.startswith("FAIL:")]
     resumo = "Autoteste grafico: **%s** - %d falha(s), %d quadro(s)." % (
         "PASS" if passou else "FAIL", len(falhas), relatorio.count("FRAME: "))
     criar_check_run("relatorio-autoteste", "Autoteste %s" % ("PASS" if passou else "FAIL"), resumo, texto,

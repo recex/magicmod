@@ -55,6 +55,18 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+
+    // Testes unitarios das partes do motor que nao dependem do jogo
+    // (matematica, curvas, linha do tempo, pre-processador de shaders...).
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+        exceptionFormat 'full'
+    }
 }
 
 tasks.named('processResources', ProcessResources).configure {

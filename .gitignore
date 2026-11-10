@@ -28,3 +28,8 @@ gen_textures.py
 build.log
 selftest.log
 glxinfo.txt
+
+# Laboratorio de shaders
+tools/shaderlab/node_modules/
+tools/shaderlab/out_*.png
+tools/shaderlab/package-lock.json

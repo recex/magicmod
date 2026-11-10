@@ -61,6 +61,14 @@ public final class SelfTestRunner {
         final int[] captureTicks;
         final int lengthTicks;
 
+        Runnable finish;
+
+        /** Acao executada quando a cena termina (verificacoes). */
+        public Scene onFinish(Runnable action) {
+            this.finish = action;
+            return this;
+        }
+
         public Scene(String name, Runnable start, int lengthTicks, int... captureTicks) {
             this.name = name;
             this.start = start;
@@ -71,6 +79,8 @@ public final class SelfTestRunner {
 
     private enum Stage { BOOT, CREATE_WORLD, WAIT_WORLD, SETTLE, SCENES, FINISH, DONE }
 
+    /** Texto extra anexado a cada linha FRAME do relatorio (estado do motor no instante da captura). */
+    public static volatile java.util.function.Supplier<String> frameInfo;
     private static final List<Scene> SCENES = new ArrayList<>();
     private static final List<Runnable> STATIC_CHECKS = new ArrayList<>();
     private static SelfTestRunner instance;
@@ -289,6 +299,13 @@ public final class SelfTestRunner {
                 long drawn = frameCounter - sceneStartFrame;
                 write(String.format(java.util.Locale.ROOT, "SCENE_DONE: %s frames=%d fps=%.1f",
                         done.name, drawn, seconds > 0 ? drawn / seconds : 0.0));
+                if (done.finish != null) {
+                    try {
+                        done.finish.run();
+                    } catch (Throwable t) {
+                        writeError("fim da cena " + done.name, t);
+                    }
+                }
             }
             sceneIndex++;
             sceneTicks = 0;
@@ -348,6 +365,7 @@ public final class SelfTestRunner {
             }
         }
         frames++;
-        write("FRAME: " + name + " fps=" + mc.getFps());
+        java.util.function.Supplier<String> info = frameInfo;
+        write("FRAME: " + name + " fps=" + mc.getFps() + (info == null ? "" : " " + info.get()));
     }
 }
