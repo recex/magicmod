@@ -26,3 +26,5 @@ Thumbs.db
 gen_lang.py
 gen_textures.py
 build.log
+selftest.log
+glxinfo.txt

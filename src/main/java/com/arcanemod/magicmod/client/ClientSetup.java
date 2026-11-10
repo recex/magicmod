@@ -18,6 +18,11 @@ public class ClientSetup {
     private static void clientSetup(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new SpellShaderTickHandler());
         MinecraftForge.EVENT_BUS.register(new SpellCastInputHandler());
+
+        if (com.arcanemod.magicmod.client.selftest.SelfTestRunner.isRequested()) {
+            event.enqueueWork(() -> MinecraftForge.EVENT_BUS.register(
+                    com.arcanemod.magicmod.client.selftest.SelfTestRunner.create()));
+        }
     }
 
     private static void registerParticles(final RegisterParticleProvidersEvent event) {

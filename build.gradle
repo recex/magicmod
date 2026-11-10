@@ -24,6 +24,12 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            // Autoteste grafico usado pela CI: gradle runClient -PmagicmodSelfTest=full
+            if (project.hasProperty('magicmodSelfTest')) {
+                property 'magicmod.selftest', project.property('magicmodSelfTest').toString()
+                property 'forge.logging.console.level', 'info'
+                args '--width', '854', '--height', '480'
+            }
             mods {
                 magicmod {
                     source sourceSets.main
